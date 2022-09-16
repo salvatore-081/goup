@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  goup:
+    image: salvatoreemilio/goup:latest
+    container_name: goup
+    network_mode: none
+    environment:
+      - LOG_LEVEL=INFO
+      - TIME=01:00
+      - MAX_RETENTION=14
+      - BACKUP_SIZE_WARNING=100
+    volumes:
+      - vol1:/app/volumes/vol1
+      - vol2:/app/volumes/vol2
+      - vol3:/app/volumes/vol3
+      - ./data:/app/data/
+
+volumes:
+  vol1:
+    external: true
+  vol2:
+    external: true
+  vol3:
+    external: true
