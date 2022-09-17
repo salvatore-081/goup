@@ -12,6 +12,8 @@ Run in a terminal:
 
 Every docker volume that you wish to backup has to be mounted in the /app/volumes folder.
 
+The backup will be saved in the docker /app/data/ folder.
+
 Or use a docker-compose.
 
 ## Configuration
