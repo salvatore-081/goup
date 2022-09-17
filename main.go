@@ -29,6 +29,7 @@ func main() {
 	TIME := flag.String("TIME", "01:00", "UTC time in which to perform the backup in the format hh:mm")
 	MAX_RETENTION := flag.Uint("MAX_RETENTION", 14, "backup(s) older then MAX_RETENTION will be deleted")
 	BACKUP_SIZE_WARNING := flag.Uint("BACKUP_SIZE_WARNING", 100, "if a backup size is greater then this value, in mb, a warning level log will be printed")
+	flag.Parse()
 
 	logOutput := zerolog.ConsoleWriter{Out: os.Stdout}
 	logOutput.FormatLevel = func(i interface{}) string {
@@ -48,12 +49,12 @@ func main() {
 	var l zerolog.Level
 
 	if *LOG_LEVEL == "MISSING" {
-		log.Info().Msg("missing log_level, defaulting to DEBUG")
+		log.Info().Msg("missing LOG_LEVEL, defaulting to DEBUG")
 		l = 0
 	} else {
 		l, e = zerolog.ParseLevel(strings.ToLower(*LOG_LEVEL))
 		if e != nil {
-			log.Info().Err(e).Msg(fmt.Sprintf("unknown log_level: %s, defaulting to DEBUG", *LOG_LEVEL))
+			log.Info().Err(e).Msg(fmt.Sprintf("unknown LOG_LEVEL: %s, defaulting to DEBUG", *LOG_LEVEL))
 			l = 0
 		}
 	}
@@ -82,7 +83,7 @@ func main() {
 		scheduled_time = scheduled_time.Add(24 * time.Hour)
 	}
 
-	log.Info().Msg("backup scheduled to run every day at " + scheduled_time.Format(time.RFC3339)[11:])
+	log.Info().Msg("goup backup scheduled to run every day at " + scheduled_time.Format(time.RFC3339)[11:])
 
 	schedule_timer := time.NewTimer(time.Until(scheduled_time))
 
