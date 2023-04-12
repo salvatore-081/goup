@@ -1,6 +1,6 @@
 module github.com/salvatore-081/goup
 
-go 1.18
+go 1.20
 
 require github.com/rs/zerolog v1.29.0
 
