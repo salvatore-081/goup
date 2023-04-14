@@ -1,0 +1,694 @@
+definitions:
+  models.AddVolumeToBackupBody:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.Default:
+    properties:
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  models.Module:
+    properties:
+      info:
+        type: string
+      path:
+        type: string
+      replace:
+        $ref: '#/definitions/models.Module'
+      sum:
+        type: string
+    type: object
+  swarm.Version:
+    properties:
+      index:
+        type: integer
+    type: object
+  volume.AccessMode:
+    properties:
+      blockVolume:
+        allOf:
+        - $ref: '#/definitions/volume.TypeBlock'
+        description: |-
+          BlockVolume defines options for using this volume as a Block-type
+          volume.
+
+          Either BlockVolume or MountVolume, but not both, must be present.
+      mountVolume:
+        allOf:
+        - $ref: '#/definitions/volume.TypeMount'
+        description: |-
+          MountVolume defines options for using this volume as a Mount-type
+          volume.
+
+          Either BlockVolume or MountVolume, but not both, must be present.
+      scope:
+        allOf:
+        - $ref: '#/definitions/volume.Scope'
+        description: Scope defines the set of nodes this volume can be used on at
+          one time.
+      sharing:
+        allOf:
+        - $ref: '#/definitions/volume.SharingMode'
+        description: |-
+          Sharing defines the number and way that different tasks can use this
+          volume at one time.
+    type: object
+  volume.Availability:
+    enum:
+    - active
+    - pause
+    - drain
+    type: string
+    x-enum-varnames:
+    - AvailabilityActive
+    - AvailabilityPause
+    - AvailabilityDrain
+  volume.CapacityRange:
+    properties:
+      limitBytes:
+        description: |-
+          LimitBytes specifies that a volume must not be bigger than this. The
+          value of 0 indicates an unspecified maximum
+        type: integer
+      requiredBytes:
+        description: |-
+          RequiredBytes specifies that a volume must be at least this big. The
+          value of 0 indicates an unspecified minimum.
+        type: integer
+    type: object
+  volume.ClusterVolume:
+    properties:
+      createdAt:
+        type: string
+      id:
+        description: |-
+          ID is the Swarm ID of the volume. Because cluster volumes are Swarm
+          objects, they have an ID, unlike non-cluster volumes, which only have a
+          Name. This ID can be used to refer to the cluster volume.
+        type: string
+      info:
+        allOf:
+        - $ref: '#/definitions/volume.Info'
+        description: Info is information about the global status of the volume.
+      publishStatus:
+        description: |-
+          PublishStatus contains the status of the volume as it pertains to its
+          publishing on Nodes.
+        items:
+          $ref: '#/definitions/volume.PublishStatus'
+        type: array
+      spec:
+        allOf:
+        - $ref: '#/definitions/volume.ClusterVolumeSpec'
+        description: Spec is the cluster-specific options from which this volume is
+          derived.
+      updatedAt:
+        type: string
+      version:
+        $ref: '#/definitions/swarm.Version'
+    type: object
+  volume.ClusterVolumeSpec:
+    properties:
+      accessMode:
+        allOf:
+        - $ref: '#/definitions/volume.AccessMode'
+        description: AccessMode defines how the volume is used by tasks.
+      accessibilityRequirements:
+        allOf:
+        - $ref: '#/definitions/volume.TopologyRequirement'
+        description: |-
+          AccessibilityRequirements specifies where in the cluster a volume must
+          be accessible from.
+
+          This field must be empty if the plugin does not support
+          VOLUME_ACCESSIBILITY_CONSTRAINTS capabilities. If it is present but the
+          plugin does not support it, volume will not be created.
+
+          If AccessibilityRequirements is empty, but the plugin does support
+          VOLUME_ACCESSIBILITY_CONSTRAINTS, then Swarmkit will assume the entire
+          cluster is a valid target for the volume.
+      availability:
+        allOf:
+        - $ref: '#/definitions/volume.Availability'
+        description: |-
+          Availability is the Volume's desired availability. Analogous to Node
+          Availability, this allows the user to take volumes offline in order to
+          update or delete them.
+      capacityRange:
+        allOf:
+        - $ref: '#/definitions/volume.CapacityRange'
+        description: |-
+          CapacityRange defines the desired capacity that the volume should be
+          created with. If nil, the plugin will decide the capacity.
+      group:
+        description: |-
+          Group defines the volume group of this volume. Volumes belonging to the
+          same group can be referred to by group name when creating Services.
+          Referring to a volume by group instructs swarm to treat volumes in that
+          group interchangeably for the purpose of scheduling. Volumes with an
+          empty string for a group technically all belong to the same, emptystring
+          group.
+        type: string
+      secrets:
+        description: |-
+          Secrets defines Swarm Secrets that are passed to the CSI storage plugin
+          when operating on this volume.
+        items:
+          $ref: '#/definitions/volume.Secret'
+        type: array
+    type: object
+  volume.Info:
+    properties:
+      accessibleTopology:
+        description: |-
+          AccessibleTopolgoy is the topology this volume is actually accessible
+          from.
+        items:
+          $ref: '#/definitions/volume.Topology'
+        type: array
+      capacityBytes:
+        description: |-
+          CapacityBytes is the capacity of the volume in bytes. A value of 0
+          indicates that the capacity is unknown.
+        type: integer
+      volumeContext:
+        additionalProperties:
+          type: string
+        description: |-
+          VolumeContext is the context originating from the CSI storage plugin
+          when the Volume is created.
+        type: object
+      volumeID:
+        description: |-
+          VolumeID is the ID of the Volume as seen by the CSI storage plugin. This
+          is distinct from the Volume's Swarm ID, which is the ID used by all of
+          the Docker Engine to refer to the Volume. If this field is blank, then
+          the Volume has not been successfully created yet.
+        type: string
+    type: object
+  volume.PublishState:
+    enum:
+    - pending-publish
+    - published
+    - pending-node-unpublish
+    - pending-controller-unpublish
+    type: string
+    x-enum-varnames:
+    - StatePending
+    - StatePublished
+    - StatePendingNodeUnpublish
+    - StatePendingUnpublish
+  volume.PublishStatus:
+    properties:
+      nodeID:
+        description: NodeID is the ID of the swarm node this Volume is published to.
+        type: string
+      publishContext:
+        additionalProperties:
+          type: string
+        description: |-
+          PublishContext is the PublishContext returned by the CSI plugin when
+          a volume is published.
+        type: object
+      state:
+        allOf:
+        - $ref: '#/definitions/volume.PublishState'
+        description: State is the publish state of the volume.
+    type: object
+  volume.Scope:
+    enum:
+    - single
+    - multi
+    type: string
+    x-enum-varnames:
+    - ScopeSingleNode
+    - ScopeMultiNode
+  volume.Secret:
+    properties:
+      key:
+        description: Key is the name of the key of the key-value pair passed to the
+          plugin.
+        type: string
+      secret:
+        description: |-
+          Secret is the swarm Secret object from which to read data. This can be a
+          Secret name or ID. The Secret data is retrieved by Swarm and used as the
+          value of the key-value pair passed to the plugin.
+        type: string
+    type: object
+  volume.SharingMode:
+    enum:
+    - none
+    - readonly
+    - onewriter
+    - all
+    type: string
+    x-enum-varnames:
+    - SharingNone
+    - SharingReadOnly
+    - SharingOneWriter
+    - SharingAll
+  volume.Topology:
+    properties:
+      segments:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  volume.TopologyRequirement:
+    properties:
+      preferred:
+        description: |-
+          Preferred is a list of Topologies that the volume should attempt to be
+          provisioned in.
+
+          Taken from the CSI spec:
+
+          Specifies the list of topologies the CO would prefer the volume to
+          be provisioned in.
+
+          This field is OPTIONAL. If TopologyRequirement is specified either
+          requisite or preferred or both MUST be specified.
+
+          An SP MUST attempt to make the provisioned volume available using
+          the preferred topologies in order from first to last.
+
+          If requisite is specified, all topologies in preferred list MUST
+          also be present in the list of requisite topologies.
+
+          If the SP is unable to to make the provisioned volume available
+          from any of the preferred topologies, the SP MAY choose a topology
+          from the list of requisite topologies.
+          If the list of requisite topologies is not specified, then the SP
+          MAY choose from the list of all possible topologies.
+          If the list of requisite topologies is specified and the SP is
+          unable to to make the provisioned volume available from any of the
+          requisite topologies it MUST fail the CreateVolume call.
+
+          Example 1:
+          Given a volume should be accessible from a single zone, and
+          requisite =
+            {"region": "R1", "zone": "Z2"},
+            {"region": "R1", "zone": "Z3"}
+          preferred =
+            {"region": "R1", "zone": "Z3"}
+          then the the SP SHOULD first attempt to make the provisioned volume
+          available from "zone" "Z3" in the "region" "R1" and fall back to
+          "zone" "Z2" in the "region" "R1" if that is not possible.
+
+          Example 2:
+          Given a volume should be accessible from a single zone, and
+          requisite =
+            {"region": "R1", "zone": "Z2"},
+            {"region": "R1", "zone": "Z3"},
+            {"region": "R1", "zone": "Z4"},
+            {"region": "R1", "zone": "Z5"}
+          preferred =
+            {"region": "R1", "zone": "Z4"},
+            {"region": "R1", "zone": "Z2"}
+          then the the SP SHOULD first attempt to make the provisioned volume
+          accessible from "zone" "Z4" in the "region" "R1" and fall back to
+          "zone" "Z2" in the "region" "R1" if that is not possible. If that
+          is not possible, the SP may choose between either the "zone"
+          "Z3" or "Z5" in the "region" "R1".
+
+          Example 3:
+          Given a volume should be accessible from TWO zones (because an
+          opaque parameter in CreateVolumeRequest, for example, specifies
+          the volume is accessible from two zones, aka synchronously
+          replicated), and
+          requisite =
+            {"region": "R1", "zone": "Z2"},
+            {"region": "R1", "zone": "Z3"},
+            {"region": "R1", "zone": "Z4"},
+            {"region": "R1", "zone": "Z5"}
+          preferred =
+            {"region": "R1", "zone": "Z5"},
+            {"region": "R1", "zone": "Z3"}
+          then the the SP SHOULD first attempt to make the provisioned volume
+          accessible from the combination of the two "zones" "Z5" and "Z3" in
+          the "region" "R1". If that's not possible, it should fall back to
+          a combination of "Z5" and other possibilities from the list of
+          requisite. If that's not possible, it should fall back  to a
+          combination of "Z3" and other possibilities from the list of
+          requisite. If that's not possible, it should fall back  to a
+          combination of other possibilities from the list of requisite.
+        items:
+          $ref: '#/definitions/volume.Topology'
+        type: array
+      requisite:
+        description: |-
+          Requisite specifies a list of Topologies, at least one of which the
+          volume must be accessible from.
+
+          Taken verbatim from the CSI Spec:
+
+          Specifies the list of topologies the provisioned volume MUST be
+          accessible from.
+          This field is OPTIONAL. If TopologyRequirement is specified either
+          requisite or preferred or both MUST be specified.
+
+          If requisite is specified, the provisioned volume MUST be
+          accessible from at least one of the requisite topologies.
+
+          Given
+            x = number of topologies provisioned volume is accessible from
+            n = number of requisite topologies
+          The CO MUST ensure n >= 1. The SP MUST ensure x >= 1
+          If x==n, then the SP MUST make the provisioned volume available to
+          all topologies from the list of requisite topologies. If it is
+          unable to do so, the SP MUST fail the CreateVolume call.
+          For example, if a volume should be accessible from a single zone,
+          and requisite =
+            {"region": "R1", "zone": "Z2"}
+          then the provisioned volume MUST be accessible from the "region"
+          "R1" and the "zone" "Z2".
+          Similarly, if a volume should be accessible from two zones, and
+          requisite =
+            {"region": "R1", "zone": "Z2"},
+            {"region": "R1", "zone": "Z3"}
+          then the provisioned volume MUST be accessible from the "region"
+          "R1" and both "zone" "Z2" and "zone" "Z3".
+
+          If x<n, then the SP SHALL choose x unique topologies from the list
+          of requisite topologies. If it is unable to do so, the SP MUST fail
+          the CreateVolume call.
+          For example, if a volume should be accessible from a single zone,
+          and requisite =
+            {"region": "R1", "zone": "Z2"},
+            {"region": "R1", "zone": "Z3"}
+          then the SP may choose to make the provisioned volume available in
+          either the "zone" "Z2" or the "zone" "Z3" in the "region" "R1".
+          Similarly, if a volume should be accessible from two zones, and
+          requisite =
+            {"region": "R1", "zone": "Z2"},
+            {"region": "R1", "zone": "Z3"},
+            {"region": "R1", "zone": "Z4"}
+          then the provisioned volume MUST be accessible from any combination
+          of two unique topologies: e.g. "R1/Z2" and "R1/Z3", or "R1/Z2" and
+           "R1/Z4", or "R1/Z3" and "R1/Z4".
+
+          If x>n, then the SP MUST make the provisioned volume available from
+          all topologies from the list of requisite topologies and MAY choose
+          the remaining x-n unique topologies from the list of all possible
+          topologies. If it is unable to do so, the SP MUST fail the
+          CreateVolume call.
+          For example, if a volume should be accessible from two zones, and
+          requisite =
+            {"region": "R1", "zone": "Z2"}
+          then the provisioned volume MUST be accessible from the "region"
+          "R1" and the "zone" "Z2" and the SP may select the second zone
+          independently, e.g. "R1/Z4".
+        items:
+          $ref: '#/definitions/volume.Topology'
+        type: array
+    type: object
+  volume.TypeBlock:
+    type: object
+  volume.TypeMount:
+    properties:
+      fsType:
+        description: FsType specifies the filesystem type for the mount volume. Optional.
+        type: string
+      mountFlags:
+        description: MountFlags defines flags to pass when mounting the volume. Optional.
+        items:
+          type: string
+        type: array
+    type: object
+  volume.UsageData:
+    properties:
+      RefCount:
+        description: |-
+          The number of containers referencing this volume. This field
+          is set to `-1` if the reference-count is not available.
+
+          Required: true
+        type: integer
+      Size:
+        description: |-
+          Amount of disk space used by the volume (in bytes). This information
+          is only available for volumes created with the `"local"` volume
+          driver. For volumes created with other volume drivers, this field
+          is set to `-1` ("not available")
+
+          Required: true
+        type: integer
+    type: object
+  volume.Volume:
+    properties:
+      ClusterVolume:
+        allOf:
+        - $ref: '#/definitions/volume.ClusterVolume'
+        description: cluster volume
+      CreatedAt:
+        description: Date/Time the volume was created.
+        type: string
+      Driver:
+        description: |-
+          Name of the volume driver used by the volume.
+          Required: true
+        type: string
+      Labels:
+        additionalProperties:
+          type: string
+        description: |-
+          User-defined key/value metadata.
+          Required: true
+        type: object
+      Mountpoint:
+        description: |-
+          Mount path of the volume on the host.
+          Required: true
+        type: string
+      Name:
+        description: |-
+          Name of the volume.
+          Required: true
+        type: string
+      Options:
+        additionalProperties:
+          type: string
+        description: |-
+          The driver specific options used when creating the volume.
+
+          Required: true
+        type: object
+      Scope:
+        description: |-
+          The level at which the volume exists. Either `global` for cluster-wide,
+          or `local` for machine level.
+
+          Required: true
+        type: string
+      Status:
+        additionalProperties: true
+        description: |-
+          Low-level details about the volume, provided by the volume driver.
+          Details are returned as a map with key/value pairs:
+          `{"key":"value","key2":"value2"}`.
+
+          The `Status` field is optional, and is omitted if the volume driver
+          does not support this feature.
+        type: object
+      UsageData:
+        allOf:
+        - $ref: '#/definitions/volume.UsageData'
+        description: usage data
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+info:
+  contact:
+    email: info@salvatoreemilio.it
+    name: Salvatore Emilio
+    url: http://salvatoreemilio.it
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: GoUp API
+  version: 1.0.0
+paths:
+  /docker/volume:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/volume.Volume'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: Volume Placeholder
+      tags:
+      - Docker
+  /docker/volume/{key}:
+    get:
+      parameters:
+      - description: volume name
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/volume.Volume'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Default'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: Volume Placeholder
+      tags:
+      - Docker
+  /goup:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: GoUp Placeholder
+      tags:
+      - GoUp
+    post:
+      parameters:
+      - description: volume
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddVolumeToBackupBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.AddVolumeToBackupBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Default'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Default'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: GoUp Placeholder
+      tags:
+      - GoUp
+  /goup/{key}:
+    delete:
+      parameters:
+      - description: volume name
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - plain/text
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Default'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Default'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: GoUp Placeholder
+      tags:
+      - GoUp
+  /status/about:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Module'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: About
+      tags:
+      - status
+  /status/health:
+    get:
+      produces:
+      - plain/text
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Default'
+      security:
+      - X-API-Key: []
+      summary: Health check
+      tags:
+      - status
+securityDefinitions:
+  X-API-Key:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"

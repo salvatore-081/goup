@@ -1,0 +1,733 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "GoUp API",
+        "contact": {
+            "name": "Salvatore Emilio",
+            "url": "http://salvatoreemilio.it",
+            "email": "info@salvatoreemilio.it"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/docker/volume": {
+            "get": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Docker"
+                ],
+                "summary": "Volume Placeholder",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/volume.Volume"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/volume/{key}": {
+            "get": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Docker"
+                ],
+                "summary": "Volume Placeholder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "volume name",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/volume.Volume"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            }
+        },
+        "/goup": {
+            "get": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GoUp"
+                ],
+                "summary": "GoUp Placeholder",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GoUp"
+                ],
+                "summary": "GoUp Placeholder",
+                "parameters": [
+                    {
+                        "description": "volume",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddVolumeToBackupBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.AddVolumeToBackupBody"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            }
+        },
+        "/goup/{key}": {
+            "delete": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "plain/text"
+                ],
+                "tags": [
+                    "GoUp"
+                ],
+                "summary": "GoUp Placeholder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "volume name",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            }
+        },
+        "/status/about": {
+            "get": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "status"
+                ],
+                "summary": "About",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Module"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            }
+        },
+        "/status/health": {
+            "get": {
+                "security": [
+                    {
+                        "X-API-Key": []
+                    }
+                ],
+                "produces": [
+                    "plain/text"
+                ],
+                "tags": [
+                    "status"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Default"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.AddVolumeToBackupBody": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Default": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Module": {
+            "type": "object",
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "replace": {
+                    "$ref": "#/definitions/models.Module"
+                },
+                "sum": {
+                    "type": "string"
+                }
+            }
+        },
+        "swarm.Version": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "integer"
+                }
+            }
+        },
+        "volume.AccessMode": {
+            "type": "object",
+            "properties": {
+                "blockVolume": {
+                    "description": "BlockVolume defines options for using this volume as a Block-type\nvolume.\n\nEither BlockVolume or MountVolume, but not both, must be present.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.TypeBlock"
+                        }
+                    ]
+                },
+                "mountVolume": {
+                    "description": "MountVolume defines options for using this volume as a Mount-type\nvolume.\n\nEither BlockVolume or MountVolume, but not both, must be present.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.TypeMount"
+                        }
+                    ]
+                },
+                "scope": {
+                    "description": "Scope defines the set of nodes this volume can be used on at one time.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.Scope"
+                        }
+                    ]
+                },
+                "sharing": {
+                    "description": "Sharing defines the number and way that different tasks can use this\nvolume at one time.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.SharingMode"
+                        }
+                    ]
+                }
+            }
+        },
+        "volume.Availability": {
+            "type": "string",
+            "enum": [
+                "active",
+                "pause",
+                "drain"
+            ],
+            "x-enum-varnames": [
+                "AvailabilityActive",
+                "AvailabilityPause",
+                "AvailabilityDrain"
+            ]
+        },
+        "volume.CapacityRange": {
+            "type": "object",
+            "properties": {
+                "limitBytes": {
+                    "description": "LimitBytes specifies that a volume must not be bigger than this. The\nvalue of 0 indicates an unspecified maximum",
+                    "type": "integer"
+                },
+                "requiredBytes": {
+                    "description": "RequiredBytes specifies that a volume must be at least this big. The\nvalue of 0 indicates an unspecified minimum.",
+                    "type": "integer"
+                }
+            }
+        },
+        "volume.ClusterVolume": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is the Swarm ID of the volume. Because cluster volumes are Swarm\nobjects, they have an ID, unlike non-cluster volumes, which only have a\nName. This ID can be used to refer to the cluster volume.",
+                    "type": "string"
+                },
+                "info": {
+                    "description": "Info is information about the global status of the volume.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.Info"
+                        }
+                    ]
+                },
+                "publishStatus": {
+                    "description": "PublishStatus contains the status of the volume as it pertains to its\npublishing on Nodes.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/volume.PublishStatus"
+                    }
+                },
+                "spec": {
+                    "description": "Spec is the cluster-specific options from which this volume is derived.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.ClusterVolumeSpec"
+                        }
+                    ]
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "version": {
+                    "$ref": "#/definitions/swarm.Version"
+                }
+            }
+        },
+        "volume.ClusterVolumeSpec": {
+            "type": "object",
+            "properties": {
+                "accessMode": {
+                    "description": "AccessMode defines how the volume is used by tasks.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.AccessMode"
+                        }
+                    ]
+                },
+                "accessibilityRequirements": {
+                    "description": "AccessibilityRequirements specifies where in the cluster a volume must\nbe accessible from.\n\nThis field must be empty if the plugin does not support\nVOLUME_ACCESSIBILITY_CONSTRAINTS capabilities. If it is present but the\nplugin does not support it, volume will not be created.\n\nIf AccessibilityRequirements is empty, but the plugin does support\nVOLUME_ACCESSIBILITY_CONSTRAINTS, then Swarmkit will assume the entire\ncluster is a valid target for the volume.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.TopologyRequirement"
+                        }
+                    ]
+                },
+                "availability": {
+                    "description": "Availability is the Volume's desired availability. Analogous to Node\nAvailability, this allows the user to take volumes offline in order to\nupdate or delete them.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.Availability"
+                        }
+                    ]
+                },
+                "capacityRange": {
+                    "description": "CapacityRange defines the desired capacity that the volume should be\ncreated with. If nil, the plugin will decide the capacity.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.CapacityRange"
+                        }
+                    ]
+                },
+                "group": {
+                    "description": "Group defines the volume group of this volume. Volumes belonging to the\nsame group can be referred to by group name when creating Services.\nReferring to a volume by group instructs swarm to treat volumes in that\ngroup interchangeably for the purpose of scheduling. Volumes with an\nempty string for a group technically all belong to the same, emptystring\ngroup.",
+                    "type": "string"
+                },
+                "secrets": {
+                    "description": "Secrets defines Swarm Secrets that are passed to the CSI storage plugin\nwhen operating on this volume.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/volume.Secret"
+                    }
+                }
+            }
+        },
+        "volume.Info": {
+            "type": "object",
+            "properties": {
+                "accessibleTopology": {
+                    "description": "AccessibleTopolgoy is the topology this volume is actually accessible\nfrom.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/volume.Topology"
+                    }
+                },
+                "capacityBytes": {
+                    "description": "CapacityBytes is the capacity of the volume in bytes. A value of 0\nindicates that the capacity is unknown.",
+                    "type": "integer"
+                },
+                "volumeContext": {
+                    "description": "VolumeContext is the context originating from the CSI storage plugin\nwhen the Volume is created.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "volumeID": {
+                    "description": "VolumeID is the ID of the Volume as seen by the CSI storage plugin. This\nis distinct from the Volume's Swarm ID, which is the ID used by all of\nthe Docker Engine to refer to the Volume. If this field is blank, then\nthe Volume has not been successfully created yet.",
+                    "type": "string"
+                }
+            }
+        },
+        "volume.PublishState": {
+            "type": "string",
+            "enum": [
+                "pending-publish",
+                "published",
+                "pending-node-unpublish",
+                "pending-controller-unpublish"
+            ],
+            "x-enum-varnames": [
+                "StatePending",
+                "StatePublished",
+                "StatePendingNodeUnpublish",
+                "StatePendingUnpublish"
+            ]
+        },
+        "volume.PublishStatus": {
+            "type": "object",
+            "properties": {
+                "nodeID": {
+                    "description": "NodeID is the ID of the swarm node this Volume is published to.",
+                    "type": "string"
+                },
+                "publishContext": {
+                    "description": "PublishContext is the PublishContext returned by the CSI plugin when\na volume is published.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "state": {
+                    "description": "State is the publish state of the volume.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.PublishState"
+                        }
+                    ]
+                }
+            }
+        },
+        "volume.Scope": {
+            "type": "string",
+            "enum": [
+                "single",
+                "multi"
+            ],
+            "x-enum-varnames": [
+                "ScopeSingleNode",
+                "ScopeMultiNode"
+            ]
+        },
+        "volume.Secret": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "description": "Key is the name of the key of the key-value pair passed to the plugin.",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "Secret is the swarm Secret object from which to read data. This can be a\nSecret name or ID. The Secret data is retrieved by Swarm and used as the\nvalue of the key-value pair passed to the plugin.",
+                    "type": "string"
+                }
+            }
+        },
+        "volume.SharingMode": {
+            "type": "string",
+            "enum": [
+                "none",
+                "readonly",
+                "onewriter",
+                "all"
+            ],
+            "x-enum-varnames": [
+                "SharingNone",
+                "SharingReadOnly",
+                "SharingOneWriter",
+                "SharingAll"
+            ]
+        },
+        "volume.Topology": {
+            "type": "object",
+            "properties": {
+                "segments": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "volume.TopologyRequirement": {
+            "type": "object",
+            "properties": {
+                "preferred": {
+                    "description": "Preferred is a list of Topologies that the volume should attempt to be\nprovisioned in.\n\nTaken from the CSI spec:\n\nSpecifies the list of topologies the CO would prefer the volume to\nbe provisioned in.\n\nThis field is OPTIONAL. If TopologyRequirement is specified either\nrequisite or preferred or both MUST be specified.\n\nAn SP MUST attempt to make the provisioned volume available using\nthe preferred topologies in order from first to last.\n\nIf requisite is specified, all topologies in preferred list MUST\nalso be present in the list of requisite topologies.\n\nIf the SP is unable to to make the provisioned volume available\nfrom any of the preferred topologies, the SP MAY choose a topology\nfrom the list of requisite topologies.\nIf the list of requisite topologies is not specified, then the SP\nMAY choose from the list of all possible topologies.\nIf the list of requisite topologies is specified and the SP is\nunable to to make the provisioned volume available from any of the\nrequisite topologies it MUST fail the CreateVolume call.\n\nExample 1:\nGiven a volume should be accessible from a single zone, and\nrequisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"}\npreferred =\n  {\"region\": \"R1\", \"zone\": \"Z3\"}\nthen the the SP SHOULD first attempt to make the provisioned volume\navailable from \"zone\" \"Z3\" in the \"region\" \"R1\" and fall back to\n\"zone\" \"Z2\" in the \"region\" \"R1\" if that is not possible.\n\nExample 2:\nGiven a volume should be accessible from a single zone, and\nrequisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"},\n  {\"region\": \"R1\", \"zone\": \"Z4\"},\n  {\"region\": \"R1\", \"zone\": \"Z5\"}\npreferred =\n  {\"region\": \"R1\", \"zone\": \"Z4\"},\n  {\"region\": \"R1\", \"zone\": \"Z2\"}\nthen the the SP SHOULD first attempt to make the provisioned volume\naccessible from \"zone\" \"Z4\" in the \"region\" \"R1\" and fall back to\n\"zone\" \"Z2\" in the \"region\" \"R1\" if that is not possible. If that\nis not possible, the SP may choose between either the \"zone\"\n\"Z3\" or \"Z5\" in the \"region\" \"R1\".\n\nExample 3:\nGiven a volume should be accessible from TWO zones (because an\nopaque parameter in CreateVolumeRequest, for example, specifies\nthe volume is accessible from two zones, aka synchronously\nreplicated), and\nrequisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"},\n  {\"region\": \"R1\", \"zone\": \"Z4\"},\n  {\"region\": \"R1\", \"zone\": \"Z5\"}\npreferred =\n  {\"region\": \"R1\", \"zone\": \"Z5\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"}\nthen the the SP SHOULD first attempt to make the provisioned volume\naccessible from the combination of the two \"zones\" \"Z5\" and \"Z3\" in\nthe \"region\" \"R1\". If that's not possible, it should fall back to\na combination of \"Z5\" and other possibilities from the list of\nrequisite. If that's not possible, it should fall back  to a\ncombination of \"Z3\" and other possibilities from the list of\nrequisite. If that's not possible, it should fall back  to a\ncombination of other possibilities from the list of requisite.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/volume.Topology"
+                    }
+                },
+                "requisite": {
+                    "description": "Requisite specifies a list of Topologies, at least one of which the\nvolume must be accessible from.\n\nTaken verbatim from the CSI Spec:\n\nSpecifies the list of topologies the provisioned volume MUST be\naccessible from.\nThis field is OPTIONAL. If TopologyRequirement is specified either\nrequisite or preferred or both MUST be specified.\n\nIf requisite is specified, the provisioned volume MUST be\naccessible from at least one of the requisite topologies.\n\nGiven\n  x = number of topologies provisioned volume is accessible from\n  n = number of requisite topologies\nThe CO MUST ensure n \u003e= 1. The SP MUST ensure x \u003e= 1\nIf x==n, then the SP MUST make the provisioned volume available to\nall topologies from the list of requisite topologies. If it is\nunable to do so, the SP MUST fail the CreateVolume call.\nFor example, if a volume should be accessible from a single zone,\nand requisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"}\nthen the provisioned volume MUST be accessible from the \"region\"\n\"R1\" and the \"zone\" \"Z2\".\nSimilarly, if a volume should be accessible from two zones, and\nrequisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"}\nthen the provisioned volume MUST be accessible from the \"region\"\n\"R1\" and both \"zone\" \"Z2\" and \"zone\" \"Z3\".\n\nIf x\u003cn, then the SP SHALL choose x unique topologies from the list\nof requisite topologies. If it is unable to do so, the SP MUST fail\nthe CreateVolume call.\nFor example, if a volume should be accessible from a single zone,\nand requisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"}\nthen the SP may choose to make the provisioned volume available in\neither the \"zone\" \"Z2\" or the \"zone\" \"Z3\" in the \"region\" \"R1\".\nSimilarly, if a volume should be accessible from two zones, and\nrequisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"},\n  {\"region\": \"R1\", \"zone\": \"Z3\"},\n  {\"region\": \"R1\", \"zone\": \"Z4\"}\nthen the provisioned volume MUST be accessible from any combination\nof two unique topologies: e.g. \"R1/Z2\" and \"R1/Z3\", or \"R1/Z2\" and\n \"R1/Z4\", or \"R1/Z3\" and \"R1/Z4\".\n\nIf x\u003en, then the SP MUST make the provisioned volume available from\nall topologies from the list of requisite topologies and MAY choose\nthe remaining x-n unique topologies from the list of all possible\ntopologies. If it is unable to do so, the SP MUST fail the\nCreateVolume call.\nFor example, if a volume should be accessible from two zones, and\nrequisite =\n  {\"region\": \"R1\", \"zone\": \"Z2\"}\nthen the provisioned volume MUST be accessible from the \"region\"\n\"R1\" and the \"zone\" \"Z2\" and the SP may select the second zone\nindependently, e.g. \"R1/Z4\".",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/volume.Topology"
+                    }
+                }
+            }
+        },
+        "volume.TypeBlock": {
+            "type": "object"
+        },
+        "volume.TypeMount": {
+            "type": "object",
+            "properties": {
+                "fsType": {
+                    "description": "FsType specifies the filesystem type for the mount volume. Optional.",
+                    "type": "string"
+                },
+                "mountFlags": {
+                    "description": "MountFlags defines flags to pass when mounting the volume. Optional.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "volume.UsageData": {
+            "type": "object",
+            "properties": {
+                "RefCount": {
+                    "description": "The number of containers referencing this volume. This field\nis set to `-1` if the reference-count is not available.\n\nRequired: true",
+                    "type": "integer"
+                },
+                "Size": {
+                    "description": "Amount of disk space used by the volume (in bytes). This information\nis only available for volumes created with the `\"local\"` volume\ndriver. For volumes created with other volume drivers, this field\nis set to `-1` (\"not available\")\n\nRequired: true",
+                    "type": "integer"
+                }
+            }
+        },
+        "volume.Volume": {
+            "type": "object",
+            "properties": {
+                "ClusterVolume": {
+                    "description": "cluster volume",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.ClusterVolume"
+                        }
+                    ]
+                },
+                "CreatedAt": {
+                    "description": "Date/Time the volume was created.",
+                    "type": "string"
+                },
+                "Driver": {
+                    "description": "Name of the volume driver used by the volume.\nRequired: true",
+                    "type": "string"
+                },
+                "Labels": {
+                    "description": "User-defined key/value metadata.\nRequired: true",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "Mountpoint": {
+                    "description": "Mount path of the volume on the host.\nRequired: true",
+                    "type": "string"
+                },
+                "Name": {
+                    "description": "Name of the volume.\nRequired: true",
+                    "type": "string"
+                },
+                "Options": {
+                    "description": "The driver specific options used when creating the volume.\n\nRequired: true",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "Scope": {
+                    "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.\n\nRequired: true",
+                    "type": "string"
+                },
+                "Status": {
+                    "description": "Low-level details about the volume, provided by the volume driver.\nDetails are returned as a map with key/value pairs:\n`{\"key\":\"value\",\"key2\":\"value2\"}`.\n\nThe `Status` field is optional, and is omitted if the volume driver\ndoes not support this feature.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "UsageData": {
+                    "description": "usage data",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/volume.UsageData"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "X-API-Key": {
+            "type": "apiKey",
+            "name": "X-API-Key",
+            "in": "header"
+        }
+    },
+    "externalDocs": {
+        "description": "OpenAPI",
+        "url": "https://swagger.io/resources/open-api/"
+    }
+}

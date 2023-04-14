@@ -3,6 +3,7 @@ package main
 import (
 	"archive/zip"
 	"compress/flate"
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"math"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -19,50 +21,126 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	_ "github.com/salvatore-081/goup/docs"
+
+	_ "github.com/docker/docker/api/types/volume"
+	"github.com/salvatore-081/goup/internal"
+	"github.com/salvatore-081/goup/internal/controllers"
+	"github.com/salvatore-081/goup/internal/middlewares"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title GoUp API
+// @version 1.0.0
+// @contact.name Salvatore Emilio
+// @contact.url http://salvatoreemilio.it
+// @contact.email info@salvatoreemilio.it
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
+// @securitydefinitions.apikey X-API-Key
+// @in header
+// @name X-API-Key
+// @host https://goup.salvatoreemilio.it
 func main() {
-
+	PORT := flag.String("PORT", "8080", "API port")
 	LOG_LEVEL := flag.String("LOG_LEVEL", "MISSING", "log level")
+	X_API_KEY := flag.String("X_API_KEY", "", "X-API-Key")
 	TIME := flag.String("TIME", "01:00", "UTC time in which to perform the backup in the format hh:mm")
 	MAX_RETENTION := flag.Uint("MAX_RETENTION", 14, "backup(s) older then MAX_RETENTION will be deleted")
 	BACKUP_SIZE_WARNING := flag.Uint("BACKUP_SIZE_WARNING", 100, "if a backup size is greater then this value, in mb, a warning level log will be printed")
 	flag.Parse()
 
-	logOutput := zerolog.ConsoleWriter{Out: os.Stdout}
+	logOutput := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
 	logOutput.FormatLevel = func(i interface{}) string {
 		return strings.ToUpper(fmt.Sprintf("|%s|", i))
 	}
 
-	logOutput.FormatTimestamp = func(i interface{}) string {
-		return ""
-	}
+	log.Logger = zerolog.New(logOutput).With().Timestamp().Logger()
 
-	log.Logger = zerolog.New(logOutput)
+	log.Info().Str("SERVICE", "GoUp").Msg("Starting...")
 
-	log.Info().Msg("goup starting up")
-
-	// LOGGER
 	var e error
 	var l zerolog.Level
 
 	if *LOG_LEVEL == "MISSING" {
-		log.Info().Msg("missing LOG_LEVEL, defaulting to DEBUG")
+		log.Info().Str("SERVICE", "GoUp").Msg("missing LOG_LEVEL, defaulting to DEBUG")
 		l = 0
 	} else {
 		l, e = zerolog.ParseLevel(strings.ToLower(*LOG_LEVEL))
 		if e != nil {
-			log.Info().Err(e).Msg(fmt.Sprintf("unknown LOG_LEVEL: %s, defaulting to DEBUG", *LOG_LEVEL))
+			log.Info().Str("SERVICE", "GoUp").Err(e).Msg(fmt.Sprintf("unknown LOG_LEVEL: %s, defaulting to DEBUG", *LOG_LEVEL))
 			l = 0
 		}
 	}
 	zerolog.SetGlobalLevel(l)
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	var r internal.Resolver
+	e = r.Create(*X_API_KEY)
+	if e != nil {
+		log.Fatal().Str("SERVICE", "GoUp").Err(e).Msg("")
+	}
 
+	gin.SetMode(gin.ReleaseMode)
+
+	g := gin.New()
+
+	g.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "X-API-Key"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	g.Use(middlewares.GinLoggerMiddleware())
+
+	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
+
+	controllers.Status(g.Group("/status"), &r)
+	controllers.Docker(g.Group("/docker"), &r)
+	controllers.GoUp(g.Group("/goup"), &r)
+
+	s := &http.Server{
+		Addr:    ":" + *PORT,
+		Handler: g,
+	}
+
+	go func() {
+		log.Info().Str("SERVICE", "GoUp").Msg("listening and serving HTTP on port " + *PORT)
+		if e := s.ListenAndServe(); e != nil && e != http.ErrServerClosed {
+		}
+	}()
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	<-ctx.Done()
+	stop()
+	log.Info().Str("SERVICE", "GoUp").Msg("Shutting down gracefully, press Ctrl+C to force")
+
+	ctx, cancel := context.WithTimeout(context.Background(), (10 * time.Second))
+	defer cancel()
+
+	e = s.Shutdown(ctx)
+	if e != nil {
+		log.Fatal().Err(e).Msg("")
+	}
+
+	e = r.Close(ctx)
+	if e != nil {
+		log.Fatal().Err(e).Msg("")
+	}
+
+	log.Info().Str("SERVICE", "GoUp").Msg("Gracefull shut down completed")
+
+	return
 	configTimeSplit := strings.Split(*TIME, ":")
 	h, e := strconv.Atoi(configTimeSplit[0])
 	if e != nil {
@@ -211,12 +289,12 @@ func main() {
 			scheduled_time = scheduled_time.Add(24 * time.Hour)
 			schedule_timer.Reset(time.Until(scheduled_time))
 
-		case <-stop:
-			schedule_timer.Stop()
-			log.Info().Msg("waiting for current the process to complete")
-			wg.Wait()
-			log.Info().Msg("exit")
-			return
+			// case <-stop:
+			// 	schedule_timer.Stop()
+			// 	log.Info().Msg("waiting for current the process to complete")
+			// 	wg.Wait()
+			// 	log.Info().Msg("exit")
+			// 	return
 		}
 	}
 }
